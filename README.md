@@ -22,39 +22,108 @@ A complete Java web application demonstrating SAML 2.0 Single Sign-On (SSO) inte
 
 ## 🛠️ Installation & Setup
 
-### 1. Clone the Repository
+### Option 1: Docker Deployment (Recommended)
+
+#### Prerequisites
+- **Docker Desktop** installed and running
+- **Git** (to clone the repository)
+
+#### Quick Start with Docker
 
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/thedineshbabu/java-web-app.git
 cd java-web-app
+
+# Start the application using the provided script
+./docker-run.sh start
+
+# Or use Docker Compose directly
+docker-compose up --build
 ```
 
-### 2. Build the Application
+#### Docker Commands
 
 ```bash
-mvn clean package
+# Start the application
+./docker-run.sh start
+
+# Start in development mode (with live reloading)
+./docker-run.sh dev
+
+# Start with HTTPS (Nginx proxy)
+./docker-run.sh https
+
+# View logs
+./docker-run.sh logs
+
+# Stop the application
+./docker-run.sh stop
+
+# Clean up everything
+./docker-run.sh clean
+
+# Show help
+./docker-run.sh help
 ```
 
-This will create a WAR file in the `target/` directory: `java-saml-sso.war`
+#### Access URLs (Docker)
+- **Application**: http://localhost:8080/java-saml-sso/
+- **Tomcat Manager**: http://localhost:8080/manager/ (admin/admin123)
 
-### 3. Deploy to Tomcat
+### Option 2: Traditional Deployment
 
-1. Copy the WAR file to Tomcat's `webapps/` directory:
+#### Prerequisites
+- **Java 8 or later**
+- **Apache Maven 3.6+**
+- **Apache Tomcat 9.x**
+
+#### Manual Setup
+
+1. **Clone the Repository**
    ```bash
-   cp target/java-saml-sso.war $TOMCAT_HOME/webapps/
+   git clone https://github.com/thedineshbabu/java-web-app.git
+   cd java-web-app
    ```
 
-2. Start Tomcat:
+2. **Build the Application**
    ```bash
+   mvn clean package
+   ```
+
+3. **Deploy to Tomcat**
+   ```bash
+   # Copy WAR file to Tomcat
+   cp target/java-saml-sso.war $TOMCAT_HOME/webapps/
+   
+   # Start Tomcat
    $TOMCAT_HOME/bin/startup.sh
    ```
 
-3. The application will be available at: `http://localhost:8080/java-saml-sso/`
+4. **Access the Application**
+   - URL: `http://localhost:8080/java-saml-sso/`
 
 ## ⚙️ Configuration
 
 ### 1. SAML Configuration
 
+#### For Docker Deployment
+Edit `docker/saml.properties` with your IdP settings:
+
+```properties
+# Service Provider Configuration (Docker)
+sp.entityId=https://localhost/java-saml-sso/saml/metadata
+sp.assertionConsumerService.url=https://localhost/java-saml-sso/saml/acs
+sp.singleLogoutService.url=https://localhost/java-saml-sso/saml/sls
+
+# Identity Provider Configuration
+idp.entityId=https://your-idp-domain/auth/realms/your-realm
+idp.singleSignOnService.url=https://your-idp-domain/auth/realms/your-realm/protocol/saml
+idp.singleLogoutService.url=https://your-idp-domain/auth/realms/your-realm/protocol/saml/logout
+idp.x509cert=YOUR_IDP_CERTIFICATE_HERE
+```
+
+#### For Traditional Deployment
 Edit `src/main/resources/saml.properties` with your IdP settings:
 
 ```properties

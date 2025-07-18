@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  saml-sso-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-saml-sso
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom
+      - CATALINA_OPTS=-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/usr/local/tomcat/logs
+      # Mount configuration for easy updates
+      - ./src/main/resources:/usr/local/tomcat/webapps/java-saml-sso/WEB-INF/classes
+    networks:
+      - saml-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/java-saml-sso/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Optional: Add a simple reverse proxy for SSL termination
+  nginx:
+    image: nginx:alpine
+    container_name: saml-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - saml-sso-app
+    networks:
+      - saml-network
+    restart: unless-stopped
+    profiles:
+      - proxy
+
+networks:
+  saml-network:
+    driver: bridge
+
+volumes:
+  saml-logs:
+    driver: local 

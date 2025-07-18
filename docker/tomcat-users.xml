@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomcat-users xmlns="http://tomcat.apache.org/xml"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
+              version="1.0">
+
+  <!-- 
+    Tomcat Users Configuration
+    This file provides optional admin access to Tomcat Manager
+    Default credentials: admin/admin123
+    WARNING: Change these credentials in production!
+  -->
+
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <role rolename="manager-jmx"/>
+  <role rolename="manager-status"/>
+  <role rolename="admin-gui"/>
+  <role rolename="admin-script"/>
+
+  <user username="admin" 
+        password="admin123" 
+        roles="manager-gui,manager-script,manager-jmx,manager-status,admin-gui,admin-script"/>
+
+  <!-- 
+    Access Tomcat Manager at: http://localhost:8080/manager/
+    Username: admin
+    Password: admin123
+  -->
+
+</tomcat-users> 

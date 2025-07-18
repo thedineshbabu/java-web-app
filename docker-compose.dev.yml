@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  saml-sso-app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: java-saml-sso-dev
+    ports:
+      - "8080:8080"
+      - "9999:9999"  # JMX port for debugging
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+      - CATALINA_OPTS=-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+    volumes:
+      # Mount source code for live development
+      - ./src:/app/src
+      # Mount Maven dependencies for faster builds
+      - maven-deps:/root/.m2
+      # Mount logs directory for persistence
+      - ./logs:/usr/local/tomcat/logs
+      # Mount configuration for easy updates
+      - ./docker/saml.properties:/usr/local/tomcat/webapps/java-saml-sso/WEB-INF/classes/saml.properties
+      # Mount webapp for live reloading
+      - ./src/main/webapp:/usr/local/tomcat/webapps/java-saml-sso
+    networks:
+      - saml-network-dev
+    restart: unless-stopped
+    profiles:
+      - dev
+
+  # Development database (if needed)
+  postgres-dev:
+    image: postgres:13-alpine
+    container_name: saml-postgres-dev
+    environment:
+      POSTGRES_DB: saml_app
+      POSTGRES_USER: saml_user
+      POSTGRES_PASSWORD: saml_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - saml-network-dev
+    profiles:
+      - dev
+
+  # Redis for session storage (optional)
+  redis-dev:
+    image: redis:6-alpine
+    container_name: saml-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - saml-network-dev
+    profiles:
+      - dev
+
+networks:
+  saml-network-dev:
+    driver: bridge
+
+volumes:
+  maven-deps:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local 
