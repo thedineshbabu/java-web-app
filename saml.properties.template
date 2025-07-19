@@ -1,0 +1,66 @@
+# SAML Configuration for Java SAML SSO Application
+# Replace the placeholder values with your actual Keycloak configuration
+
+# =============================================================================
+# Service Provider Configuration (Your Java Application)
+# =============================================================================
+
+# Your application's entity ID (must match Keycloak client ID)
+sp.entityId=https://localhost:8899/java-saml-sso/saml/metadata
+
+# URL where SAML responses will be sent after authentication
+sp.assertionConsumerService.url=https://localhost:8899/java-saml-sso/saml/acs
+
+# URL for single logout requests
+sp.singleLogoutService.url=https://localhost:8899/java-saml-sso/saml/sls
+
+# =============================================================================
+# Identity Provider Configuration (Keycloak)
+# =============================================================================
+
+# Keycloak realm entity ID (replace with your actual Keycloak domain and realm)
+idp.entityId=https://your-keycloak-domain/auth/realms/your-realm-name
+
+# Keycloak SSO service URL
+idp.singleSignOnService.url=https://your-keycloak-domain/auth/realms/your-realm-name/protocol/saml
+
+# Keycloak logout service URL
+idp.singleLogoutService.url=https://your-keycloak-domain/auth/realms/your-realm-name/protocol/saml/logout
+
+# Keycloak X.509 certificate (replace with your actual certificate)
+# Get this from Keycloak Admin Console → Realm Settings → Keys → Certificate
+idp.x509cert=-----BEGIN CERTIFICATE-----
+REPLACE_WITH_YOUR_ACTUAL_CERTIFICATE_HERE
+-----END CERTIFICATE-----
+
+# =============================================================================
+# Optional Configuration
+# =============================================================================
+
+# SAML signature algorithm (default: SHA256)
+sp.signatureAlgorithm=http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+
+# SAML digest algorithm (default: SHA256)
+sp.digestAlgorithm=http://www.w3.org/2001/04/xmlenc#sha256
+
+# Enable/disable SAML debugging
+sp.debug=true
+
+# Session timeout in seconds (default: 3600)
+sp.sessionTimeout=3600
+
+# =============================================================================
+# Example Configuration (for reference)
+# =============================================================================
+# 
+# If your Keycloak is running on keycloak.example.com with realm "saml-demo":
+#
+# idp.entityId=https://keycloak.example.com/auth/realms/saml-demo
+# idp.singleSignOnService.url=https://keycloak.example.com/auth/realms/saml-demo/protocol/saml
+# idp.singleLogoutService.url=https://keycloak.example.com/auth/realms/saml-demo/protocol/saml/logout
+#
+# If your application is running on localhost:8899:
+#
+# sp.entityId=https://localhost:8899/java-saml-sso/saml/metadata
+# sp.assertionConsumerService.url=https://localhost:8899/java-saml-sso/saml/acs
+# sp.singleLogoutService.url=https://localhost:8899/java-saml-sso/saml/sls 

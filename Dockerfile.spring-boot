@@ -1,0 +1,61 @@
+# Java SAML SSO Sample Application Dockerfile with Spring Boot
+# Multi-stage build for optimized image size
+
+# Stage 1: Build the application
+FROM maven:3.8.6-openjdk-8 AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy Maven configuration files
+COPY pom-spring-boot.xml pom.xml
+
+# Download dependencies (cached layer)
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Stage 2: Runtime with OpenJDK
+FROM openjdk:8-jre-slim
+
+# Set metadata
+LABEL maintainer="SAML SSO Sample App"
+LABEL description="Java SAML SSO Sample Application with Spring Boot"
+LABEL version="1.0.0"
+
+# Install additional packages for debugging and utilities
+RUN apt-get update && apt-get install -y \
+    curl \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create application user
+RUN groupadd -r samlapp && useradd -r -g samlapp samlapp
+
+# Create application directory
+WORKDIR /app
+
+# Copy the JAR file from builder stage
+COPY --from=builder /app/target/java-saml-sso-spring.jar app.jar
+
+# Create necessary directories and set permissions
+RUN mkdir -p logs && \
+    mkdir -p config && \
+    chown -R samlapp:samlapp /app
+
+# Switch to non-root user
+USER samlapp
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=45s --retries=3 \
+    CMD curl -f http://localhost:8080/java-saml-sso/ || exit 1
+
+# Start Spring Boot application
+CMD ["java", "-jar", "app.jar"] 

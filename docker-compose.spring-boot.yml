@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  saml-sso-app-spring:
+    build:
+      context: .
+      dockerfile: Dockerfile.spring-boot
+    container_name: java-saml-sso-spring
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom
+      - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/app/logs
+      # Mount configuration for easy updates
+      - ./src/main/resources:/app/config
+    networks:
+      - saml-network-spring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/java-saml-sso/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+networks:
+  saml-network-spring:
+    driver: bridge
+
+volumes:
+  spring-logs:
+    driver: local 

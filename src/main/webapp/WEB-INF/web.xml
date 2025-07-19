@@ -52,12 +52,15 @@
         <role-name>authenticated-user</role-name>
     </security-role>
 
-    <!-- SAML Configuration Context Listener -->
+    <!-- SAML Configuration Context Listener - Temporarily disabled for testing -->
+    <!--
     <listener>
         <listener-class>com.sample.saml.listener.SAMLContextListener</listener-class>
     </listener>
+    -->
 
-    <!-- SAML Session Filter -->
+    <!-- SAML Session Filter - Temporarily disabled for testing -->
+    <!--
     <filter>
         <filter-name>SAMLSessionFilter</filter-name>
         <filter-class>com.sample.saml.filter.SAMLSessionFilter</filter-class>
@@ -67,5 +70,6 @@
         <filter-name>SAMLSessionFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
 
 </web-app> 

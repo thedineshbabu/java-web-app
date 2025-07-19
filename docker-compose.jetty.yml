@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  saml-sso-app-jetty:
+    build:
+      context: .
+      dockerfile: Dockerfile.jetty
+    container_name: java-saml-sso-jetty
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/opt/jetty/logs
+      # Mount configuration for easy updates
+      - ./src/main/resources:/opt/jetty/webapps/java-saml-sso/WEB-INF/classes
+    networks:
+      - saml-network-jetty
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/java-saml-sso/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  saml-network-jetty:
+    driver: bridge
+
+volumes:
+  jetty-logs:
+    driver: local 
