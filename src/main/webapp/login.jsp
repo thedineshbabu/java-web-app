@@ -1,12 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.sample.saml.service.SAMLService" %>
+<%@ page import="com.sample.saml.util.SAMLConfig" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-    // Import required classes
-    import com.sample.saml.service.SAMLService;
-    import com.sample.saml.util.SAMLConfig;
-    import org.slf4j.Logger;
-    import org.slf4j.LoggerFactory;
-    
+    // Initialize logger
     Logger logger = LoggerFactory.getLogger("login.jsp");
     
     // Check if this is a login initiation request

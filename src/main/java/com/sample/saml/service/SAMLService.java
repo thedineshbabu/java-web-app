@@ -41,7 +41,8 @@ public class SAMLService {
      * @throws RuntimeException if SAML configuration is invalid
      */
     public SAMLService() {
-        logger.info("Initializing SAML service");
+        logger.info("🐛 DEBUG: Initializing SAML service");
+        logger.debug("🐛 DEBUG: SAMLService constructor called");
         initializeSAML();
     }
     
@@ -52,22 +53,32 @@ public class SAMLService {
      */
     private void initializeSAML() {
         try {
-            logger.debug("Loading SAML settings from configuration");
+            logger.debug("🐛 DEBUG: Loading SAML settings from configuration");
             
             // Create settings builder and configure SAML settings
             SettingsBuilder builder = new SettingsBuilder();
+            logger.debug("🐛 DEBUG: SettingsBuilder created");
             
             // Build SAML settings from configuration
-            settings = builder.fromValues(getSAMLConfiguration()).build();
+            Map<String, Object> config = getSAMLConfiguration();
+            logger.debug("🐛 DEBUG: SAML configuration retrieved, building settings");
+            settings = builder.fromValues(config).build();
+            logger.debug("🐛 DEBUG: SAML settings built successfully");
             
             // Create Auth instance with settings
             auth = new Auth(settings, null, null);
+            logger.debug("🐛 DEBUG: Auth instance created");
             
-            logger.info("SAML service initialized successfully");
-            logger.debug("SAML settings loaded - SP Entity ID: {}", settings.getSpEntityId());
+            logger.info("✅ SAML service initialized successfully");
+            logger.debug("🐛 DEBUG: SAML settings loaded - SP Entity ID: {}", settings.getSpEntityId());
             
         } catch (SettingsException e) {
-            logger.error("Failed to initialize SAML settings", e);
+            logger.error("❌ Failed to initialize SAML settings", e);
+            logger.debug("🐛 DEBUG: SettingsException details: {}", e.getMessage());
+            throw new RuntimeException("SAML initialization failed", e);
+        } catch (Exception e) {
+            logger.error("❌ Unexpected error during SAML initialization", e);
+            logger.debug("🐛 DEBUG: Exception details: {}", e.getMessage());
             throw new RuntimeException("SAML initialization failed", e);
         }
     }
@@ -168,22 +179,36 @@ public class SAMLService {
      * @throws IOException if redirect fails
      */
     public void login(HttpServletRequest request, HttpServletResponse response, String relayState) throws IOException {
-        logger.info("Initiating SAML login");
+        logger.info("🐛 DEBUG: Initiating SAML login");
+        logger.debug("🐛 DEBUG: Login method called with relayState: {}", relayState);
+        logger.debug("🐛 DEBUG: Request URL: {}", request.getRequestURL());
+        logger.debug("🐛 DEBUG: Request method: {}", request.getMethod());
         
         try {
             // Store relay state in session if provided
             if (relayState != null && !relayState.trim().isEmpty()) {
                 HttpSession session = request.getSession();
                 session.setAttribute("saml.relayState", relayState);
-                logger.debug("Stored relay state: {}", relayState);
+                logger.debug("🐛 DEBUG: Stored relay state in session: {}", relayState);
+            } else {
+                logger.debug("🐛 DEBUG: No relay state provided");
             }
             
+            // Log SAML settings for debugging
+            logger.debug("🐛 DEBUG: SP Entity ID: {}", settings.getSpEntityId());
+            logger.debug("🐛 DEBUG: IdP Entity ID: {}", settings.getIdpEntityId());
+            logger.debug("🐛 DEBUG: IdP SSO URL: {}", settings.getIdpSingleSignOnServiceUrl());
+            
             // Initiate SAML authentication
+            logger.debug("🐛 DEBUG: Calling auth.login()");
             auth.login(relayState);
-            logger.info("SAML login initiated successfully");
+            logger.info("✅ SAML login initiated successfully");
+            logger.debug("🐛 DEBUG: User should be redirected to IdP");
             
         } catch (Exception e) {
-            logger.error("Failed to initiate SAML login", e);
+            logger.error("❌ Failed to initiate SAML login", e);
+            logger.debug("🐛 DEBUG: Exception type: {}", e.getClass().getSimpleName());
+            logger.debug("🐛 DEBUG: Exception message: {}", e.getMessage());
             throw new RuntimeException("SAML login initiation failed", e);
         }
     }

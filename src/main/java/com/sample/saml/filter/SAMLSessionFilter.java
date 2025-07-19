@@ -32,6 +32,7 @@ public class SAMLSessionFilter implements Filter {
         "/metadata.jsp",
         "/sls.jsp",
         "/error.jsp",
+        "/diagnostic.jsp",
         "/css/",
         "/js/",
         "/images/",
